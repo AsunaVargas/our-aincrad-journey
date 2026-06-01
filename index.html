@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Aincrad Quest</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --panel: rgba(10, 16, 32, 0.78);
+      --line: rgba(174, 194, 255, 0.22);
+      --text: #edf2ff;
+      --muted: rgba(237, 242, 255, 0.72);
+      --accent: #7dd3fc;
+      --accent-2: #f9a8d4;
+      --good: #86efac;
+      --danger: #fb7185;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #101b3b, var(--bg) 54%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    button { font: inherit; }
+    .hidden { display: none !important; }
+    .screen { min-height: 100vh; width: 100%; position: relative; }
+
+    .boot {
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(125, 211, 252, 0.2), transparent 24%),
+        radial-gradient(circle at 20% 80%, rgba(249, 168, 212, 0.14), transparent 20%),
+        linear-gradient(180deg, #020617, #0b1020 60%, #050816);
+      position: relative;
+      overflow: hidden;
+    }
+    .boot::before,
+    .boot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 52px 52px;
+      opacity: 0.12;
+      mask-image: radial-gradient(circle at center, black 34%, transparent 80%);
+    }
+
+    .boot-card {
+      width: min(880px, calc(100vw - 32px));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(2, 6, 23, 0.72);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      padding: 28px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .boot-title {
+      font-size: clamp(30px, 5vw, 64px);
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .type-line {
+      margin-top: 18px;
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--muted);
+      white-space: pre-wrap;
+      min-height: 132px;
+    }
+
+    .boot-actions, .control-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .btn {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      padding: 12px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); }
+    .btn.primary {
+      background: linear-gradient(90deg, rgba(125,211,252,0.22), rgba(249,168,212,0.22));
+      border-color: rgba(125,211,252,0.35);
+    }
+    .btn.good { border-color: rgba(134,239,172,0.4); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      padding: 18px;
+    }
+    @media (max-width: 980px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    .sidebar, .content, .dialogue, .overlay-card, .inventory, .quest-box, .battle-box {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+    }
+
+    .sidebar, .content { min-height: calc(100vh - 36px); }
+    .sidebar {
+      padding: 18px;
+      position: sticky;
+      top: 18px;
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .meter {
+      margin-top: 6px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .meter-head { display:flex; justify-content:space-between; align-items:center; gap: 10px; }
+    .meter-title { font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+    .meter-value { font-size: 15px; color: var(--good); }
+    .bar {
+      height: 12px;
+      margin-top: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #7dd3fc, #f9a8d4);
+      transition: width .3s ease;
+    }
+
+    .health-row { display: grid; gap: 8px; }
+    .health-label { display:flex; justify-content:space-between; align-items:center; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+    .health-bar { height: 11px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .health-bar > span { display:block; height:100%; width:100%; border-radius: inherit; transition: width .2s ease; }
+    .player-fill { background: linear-gradient(90deg, #86efac, #22c55e); }
+    .boss-fill { background: linear-gradient(90deg, #fb7185, #f43f5e); }
+
+    .inventory, .quest-box, .battle-box { padding: 16px; }
+    .inventory h2, .quest-box h2, .battle-box h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .items { display:flex; flex-wrap:wrap; gap: 10px; }
+    .item {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px;
+    }
+
+    .quest-text { color: var(--muted); line-height: 1.8; font-size: 14px; margin: 0; }
+    .content { padding: 18px; position: relative; overflow: hidden; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .topbar h2 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 34px);
+      letter-spacing: 0.04em;
+    }
+    .subtle { color: var(--muted); font-size: 14px; }
+
+    .scene {
+      position: relative;
+      min-height: 680px;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      background:
+        radial-gradient(circle at top, rgba(125, 211, 252, 0.22), transparent 30%),
+        linear-gradient(180deg, rgba(7, 13, 28, 0.3), rgba(2, 6, 23, 0.85));
+    }
+    .scene-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.32;
+      filter: saturate(1.1) contrast(1.05);
+    }
+    .scene-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(2,6,23,0.88)); }
+    .floating-ui {
+      position: relative;
+      z-index: 2;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px;
+    }
+    @media (max-width: 980px) {
+      .floating-ui { grid-template-columns: 1fr; }
+    }
+
+    .stage {
+      position: relative;
+      min-height: 540px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.14);
+      overflow: hidden;
+    }
+    .gridlines::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 44px 44px;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .floor-tag {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 3;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(125,211,252,0.28);
+      background: rgba(2, 6, 23, 0.66);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .character {
+      position: absolute;
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      transform-origin: center bottom;
+      transition: transform .18s ease;
+      z-index: 3;
+    }
+    .character:hover { transform: translateY(-6px) scale(1.03); }
+    .character img {
+      width: clamp(120px, 22vw, 240px);
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 18px 32px rgba(0,0,0,0.45));
+      user-select: none;
+      pointer-events: none;
+    }
+    .char-label {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(0,0,0,0.38);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .crystal {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      transform: rotate(45deg);
+      border: 1px solid rgba(125,211,252,0.6);
+      background: linear-gradient(135deg, rgba(125,211,252,0.8), rgba(249,168,212,0.5));
+      box-shadow: 0 0 22px rgba(125,211,252,0.45);
+      cursor: pointer;
+      z-index: 4;
+      animation: float 2.6s ease-in-out infinite;
+    }
+    .crystal::after {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      background: rgba(255,255,255,0.68);
+      transform: rotate(0deg);
+      border-radius: 5px;
+      opacity: 0.55;
+    }
+    @keyframes float {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50% { transform: rotate(45deg) translateY(-7px); }
+    }
+
+    .quest-hud { display: grid; gap: 12px; }
+    .dialogue, .overlay-card { padding: 16px; }
+    .dialogue h3, .overlay-card h3, .battle-box h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .dialogue p, .overlay-card p {
+      margin: 0;
+      line-height: 1.85;
+      color: rgba(237,242,255,0.88);
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    .choice-list { display: grid; gap: 10px; margin-top: 14px; }
+    .choice-list button {
+      text-align: left;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease;
+    }
+    .choice-list button:hover { transform: translateY(-1px); background: rgba(255,255,255,0.11); }
+    .choice-list small { display: block; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+
+    .battle-box { display: none; }
+    .battle-box .battle-grid { display: grid; gap: 12px; }
+    .battle-line { display:flex; justify-content:space-between; gap: 10px; align-items:center; flex-wrap: wrap; }
+    .battle-note { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(16px);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 30;
+    }
+    .overlay-card {
+      width: min(760px, calc(100vw - 24px));
+      background: rgba(5, 11, 27, 0.94);
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .over-title {
+      margin: 0 0 8px;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .floating-note {
+      position: absolute;
+      z-index: 5;
+      right: 16px;
+      top: 16px;
+      max-width: 280px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      color: rgba(237,242,255,0.84);
+      border: 1px solid rgba(125,211,252,0.18);
+      background: rgba(2,6,23,0.52);
+    }
+
+    .tiny-yui {
+      position: absolute;
+      z-index: 5;
+      font-size: 20px;
+      cursor: pointer;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.25));
+      animation: bob 1.8s ease-in-out infinite;
+      background: transparent;
+      border: 0;
+      color: #fff;
+    }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .fade-in { animation: fadeIn .3s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body>
+  <div id="bootScreen" class="screen boot">
+    <div class="boot-card fade-in">
+      <h1 class="boot-title">Aincrad System</h1>
+      <div id="bootText" class="type-line"></div>
+      <div class="boot-actions">
+        <button class="btn primary" id="beginQuestBtn">BEGIN QUEST</button>
+        <button class="btn" id="skipBootBtn">SKIP INTRO</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameScreen" class="screen hidden">
+    <div class="main">
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>Our Aincrad</h1>
+          <span class="pill">Quest Game</span>
+        </div>
+
+        <div class="meter">
+          <div class="meter-head">
+            <div class="meter-title">Affinity</div>
+            <div class="meter-value"><span id="affinityValue">0</span>%</div>
+          </div>
+          <div class="bar"><span id="affinityBar"></span></div>
+        </div>
+
+        <div class="meter">
+          <div class="health-row">
+            <div class="health-label"><span>Player HP</span><span id="playerHpText">100</span></div>
+            <div class="health-bar"><span id="playerHpBar" class="player-fill"></span></div>
+          </div>
+        </div>
+
+        <div class="inventory">
+          <h2>Inventory</h2>
+          <div class="items" id="inventoryItems">
+            <div class="item">Memory Crystal x0</div>
+            <div class="item">Heart x0</div>
+            <div class="item">Key Fragment x0</div>
+          </div>
+        </div>
+
+        <div class="quest-box">
+          <h2>Current Quest</h2>
+          <p class="quest-text" id="questText">Awaiting quest acceptance...</p>
+        </div>
+
+        <div class="quest-box">
+          <h2>Controls</h2>
+          <div class="control-actions">
+            <button id="nextFloorBtn" class="btn good" disabled>Move to next floor</button>
+            <button id="revealEndingBtn" class="btn primary" disabled>Open final reward</button>
+            <button id="showHintBtn" class="btn">Show hint</button>
+            <button id="resetBtn" class="btn">Reset progress</button>
+          </div>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="topbar">
+          <div>
+            <h2 id="sceneTitle">Floor 1 — The Beginning</h2>
+            <div class="subtle" id="sceneSubtitle">A quest from Asuna appears before the floating castle.</div>
+          </div>
+          <div class="pill" id="floorTag">Floor 1/100</div>
+        </div>
+
+        <div class="scene">
+          <img id="sceneBg" class="scene-bg" src="images/background.jpeg" alt="Aincrad background" />
+          <div class="scene-overlay"></div>
+          <div class="floating-ui">
+            <div class="stage gridlines" id="stage">
+              <div class="floor-tag" id="floorLabel">Quest Stage: Explore</div>
+              <div class="floating-note" id="floatingNote">Click the glowing crystals. Click characters to talk. Unlock the ending by completing quests.</div>
+            </div>
+
+            <div class="quest-hud">
+              <div class="dialogue">
+                <h3>System Dialogue</h3>
+                <p id="dialogueText">A system message will appear here.</p>
+                <div class="choice-list" id="choiceList"></div>
+              </div>
+
+              <div class="overlay-card">
+                <h3>Quest Log</h3>
+                <p id="logText">Accept the quest to enter Aincrad.</p>
+              </div>
+
+              <div class="battle-box" id="battleBox">
+                <h2>Final Boss — Distance</h2>
+                <div class="battle-grid">
+                  <div>
+                    <div class="battle-line"><span class="battle-note">Boss HP</span><span id="bossHpText">100</span></div>
+                    <div class="health-bar" style="margin-top:8px;"><span id="bossHpBar" class="boss-fill"></span></div>
+                  </div>
+                  <div>
+                    <div class="battle-line"><span class="battle-note">Boss pressure hits back</span><span id="battleTurnText">Ready</span></div>
+                    <div class="battle-note" id="battleNote">Each attack hurts the boss, but the boss fights back too.</div>
+                  </div>
+                  <button class="btn primary" id="attackBtn">ATTACK</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="modal" class="overlay hidden">
+    <div class="overlay-card fade-in">
+      <h3 class="over-title" id="modalTitle">Memory Found</h3>
+      <p id="modalText"></p>
+      <div class="boot-actions" style="margin-top:18px;">
+        <button class="btn primary" id="modalCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="endingModal" class="overlay hidden">
+    <div class="overlay-card fade-in">
+      <h3 class="over-title">Happy Birthday, Ricky.</h3>
+      <p id="endingText"></p>
+      <div class="boot-actions" style="margin-top:18px;">
+        <button class="btn primary" id="endingCloseBtn">Stay a little longer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bootLines = [
+      "INITIALIZING...
+NERVEGEAR CONNECTION ESTABLISHED
+PLAYER DETECTED: KIRITO
+
+WELCOME TO AINCRAD.",
+      "A special quest has been assigned to you.
+Quest Giver: Asuna
+
+Accept the quest and begin your climb."
+    ];
+
+    const floors = [
+      {
+        floor: 1,
+        title: "Floor 1 — The Beginning",
+        subtitle: "A cherry blossom field and the first message.",
+        bg: "images/background.jpeg",
+        quest: "Find the first memory crystal and click Asuna to begin your quest.",
+        characters: [
+          {
+            id: "asuna",
+            x: 52,
+            y: 28,
+            img: "images/asuna.jpeg",
+            label: "Asuna",
+            message: "Welcome, Kirito. Before you reach Floor 100, recover our lost memories."
+          }
+        ],
+        crystals: [
+          { id: "c1", x: 18, y: 64, message: "Memory Crystal: Out of all the worlds and all the people I could have met, somehow I found you. Looking back now, I can't imagine my life without you in it." }
+        ],
+        choices: []
+      },
+      {
+        floor: 25,
+        title: "Floor 25 — Memory Collection",
+        subtitle: "Collect clues hidden across the field.",
+        bg: "images/kirisuna-classic.jpeg",
+        quest: "Find the floating crystals and open the memory cards.",
+        characters: [
+          {
+            id: "pair1",
+            x: 18,
+            y: 30,
+            img: "images/kirisuna-chibi.jpeg",
+            label: "Chibi Pair",
+            message: "We are stronger together. Keep exploring, and the map will reveal itself."
+          },
+          {
+            id: "kirito",
+            x: 67,
+            y: 32,
+            img: "images/kirito.jpeg",
+            label: "Kirito",
+            message: "Every quest is easier when I know you're waiting at the end."
+          }
+        ],
+        crystals: [
+          { id: "c2", x: 14, y: 72, message: "Memory Crystal: You always protect me when we're playing SlashCo, even though I'm shivering half the time. Somehow being scared is fun when you're there with me." },
+          { id: "c3", x: 72, y: 76, message: "Memory Crystal: Whether it was Yu-Gi-Oh!, Fairy Tail, Demon Slayer, or any other anime we decided to watch together, my favorite part was never the show itself. It was sharing it with you." }
+        ],
+        choices: []
+      },
+      {
+        floor: 50,
+        title: "Floor 50 — Choice Quest",
+        subtitle: "Choose the memory you want to unlock.",
+        bg: "images/kirisuna-ladybug.jpeg",
+        quest: "Pick one of the choices below. Each choice reveals a different message.",
+        characters: [
+          {
+            id: "asunaEat",
+            x: 24,
+            y: 34,
+            img: "images/asuna-eat.jpeg",
+            label: "Asuna Eating",
+            message: "Spoiler alert: I'm eating steak, and you're eating the food we cooked for each other because I love cooking for you."
+          },
+          {
+            id: "kiritoEat",
+            x: 63,
+            y: 30,
+            img: "images/kirito.jpeg",
+            label: "Kirito Eating",
+            message: "Spoiler alert: we're eating the food we cooked for each other, and yes, the answer is steak."
+          }
+        ],
+        crystals: [
+          { id: "c4", x: 23, y: 68, message: "Memory Crystal: No matter how much time we spend together, it never feels like enough. Every goodbye somehow turns into just a little longer." },
+          { id: "c5", x: 79, y: 20, message: "Memory Crystal: Life isn't always easy, but you've always been someone I can turn to. Thank you for comforting me, listening to me, and letting me do the same for you." }
+        ],
+        choices: [
+          {
+            label: "Eat together",
+            detail: "Open a soft memory about shared meals and cozy moments.",
+            response: "Quest result: A warm meal, a quiet smile, and the feeling of home.",
+          },
+          {
+            label: "Play games",
+            detail: "Open a memory about fun, laughter, and being silly together.",
+            response: "Quest result: Player 1 and Player 2. No boss battle can beat us.",
+          },
+          {
+            label: "Watch a movie",
+            detail: "Open a memory about resting together after a long day.",
+            response: "Quest result: Even silence is comforting when it's with you.",
+          }
+        ]
+      },
+      {
+        floor: 75,
+        title: "Floor 75 — Hidden Search",
+        subtitle: "Find the hearts hidden around the stage.",
+        bg: "images/kirisuna-persona.jpeg",
+        quest: "Collect 5 hearts. A secret achievement unlocks after the last one.",
+        characters: [
+          {
+            id: "persona",
+            x: 57,
+            y: 32,
+            img: "images/kirisuna-persona.jpeg",
+            label: "Masked Pair",
+            message: "Not every quest needs a sword. Sometimes it only needs patience and care."
+          }
+        ],
+        crystals: [
+          { id: "c6", x: 18, y: 20, message: "Memory Crystal: Whether we're getting a Victory Royale or getting eliminated five minutes into the match, playing Fortnite with you is always one of my favorite ways to spend time." },
+          { id: "c7", x: 84, y: 80, message: "Memory Crystal: Thank you for being my teammate through everything. The good days are better because of you, and the difficult days are easier because I know you're there." }
+        ],
+        choices: []
+      },
+      {
+        floor: 90,
+        title: "Floor 90 — Final Boss",
+        subtitle: "A heart-shaped battle begins.",
+        bg: "images/kirisuna-cowboy.jpeg",
+        quest: "Defeat the boss named Distance. Use ATTACK until the HP reaches zero.",
+        characters: [
+          {
+            id: "cowboy",
+            x: 49,
+            y: 29,
+            img: "images/kirisuna-cowboy.jpeg",
+            label: "Quest Form",
+            message: "We're close. Just a few more clicks and the final gate opens."
+          }
+        ],
+        crystals: [
+          { id: "c8", x: 22, y: 22, message: "Memory Crystal: Every memory we've made together has become something I'll always treasure. And the best part is knowing we're still making new ones every day." }
+        ],
+        choices: []
+      },
+      {
+        floor: 100,
+        title: "Floor 100 — The Ending",
+        subtitle: "The last message is waiting.",
+        bg: "images/kirisuna.jpeg",
+        quest: "Everything has been collected. Open the final reward.",
+        characters: [
+          {
+            id: "finalpair",
+            x: 36,
+            y: 28,
+            img: "images/kirisuna.jpeg",
+            label: "Final Pair",
+            message: "You've cleared every floor. Now open the reward and read the ending."
+          }
+        ],
+        crystals: [],
+        choices: []
+      }
+    ];
+
+    const state = {
+      floorIndex: 0,
+      affinity: 0,
+      playerHp: 100,
+      bossHp: 100,
+      attackCount: 0,
+      reviveUsed: false,
+      crystalsCollected: 0,
+      heartsCollected: 0,
+      keyFragments: 0,
+      foundCrystalIds: new Set(),
+      foundYui: new Set(),
+    };
+
+    const el = (id) => document.getElementById(id);
+    const bootText = el('bootText');
+    const beginQuestBtn = el('beginQuestBtn');
+    const skipBootBtn = el('skipBootBtn');
+    const bootScreen = el('bootScreen');
+    const gameScreen = el('gameScreen');
+    const sceneBg = el('sceneBg');
+    const stage = el('stage');
+    const floorLabel = el('floorLabel');
+    const sceneTitle = el('sceneTitle');
+    const sceneSubtitle = el('sceneSubtitle');
+    const floorTag = el('floorTag');
+    const questText = el('questText');
+    const dialogueText = el('dialogueText');
+    const choiceList = el('choiceList');
+    const logText = el('logText');
+    const affinityValue = el('affinityValue');
+    const affinityBar = el('affinityBar');
+    const playerHpText = el('playerHpText');
+    const playerHpBar = el('playerHpBar');
+    const bossHpText = el('bossHpText');
+    const bossHpBar = el('bossHpBar');
+    const battleTurnText = el('battleTurnText');
+    const battleNote = el('battleNote');
+    const inventoryItems = el('inventoryItems');
+    const nextFloorBtn = el('nextFloorBtn');
+    const revealEndingBtn = el('revealEndingBtn');
+    const showHintBtn = el('showHintBtn');
+    const resetBtn = el('resetBtn');
+    const modal = el('modal');
+    const modalTitle = el('modalTitle');
+    const modalText = el('modalText');
+    const modalCloseBtn = el('modalCloseBtn');
+    const endingModal = el('endingModal');
+    const endingText = el('endingText');
+    const endingCloseBtn = el('endingCloseBtn');
+    const battleBox = el('battleBox');
+    const attackBtn = el('attackBtn');
+    const floatingNote = el('floatingNote');
+
+    function typeBoot(lines, index = 0, charIndex = 0) {
+      if (index >= lines.length) return;
+      const line = lines[index];
+      if (charIndex <= line.length) {
+        bootText.textContent = lines.slice(0, index).join("
+
+") + (index > 0 ? "
+
+" : "") + line.slice(0, charIndex);
+        setTimeout(() => typeBoot(lines, index, charIndex + 1), 20);
+      } else {
+        setTimeout(() => typeBoot(lines, index + 1, 0), 320);
+      }
+    }
+
+    function showModal(title, text) {
+      modalTitle.textContent = title;
+      modalText.textContent = text;
+      modal.classList.remove('hidden');
+    }
+    function hideModal() { modal.classList.add('hidden'); }
+
+    function renderInventory() {
+      inventoryItems.innerHTML = `
+        <div class="item">Memory Crystal x${state.crystalsCollected}</div>
+        <div class="item">Heart x${state.heartsCollected}</div>
+        <div class="item">Key Fragment x${state.keyFragments}</div>
+      `;
+    }
+
+    function updateAffinity(amount = 0) {
+      state.affinity = Math.max(0, Math.min(100, state.affinity + amount));
+      affinityValue.textContent = state.affinity;
+      affinityBar.style.width = state.affinity + '%';
+    }
+
+    function updatePlayerHp(value) {
+      state.playerHp = Math.max(1, Math.min(100, value));
+      playerHpText.textContent = state.playerHp;
+      playerHpBar.style.width = state.playerHp + '%';
+    }
+
+    function updateBossHp(value) {
+      state.bossHp = Math.max(0, Math.min(100, value));
+      bossHpText.textContent = state.bossHp;
+      bossHpBar.style.width = state.bossHp + '%';
+    }
+
+    function clearStage() {
+      [...stage.querySelectorAll('.character, .crystal, .tiny-yui')].forEach(elm => elm.remove());
+    }
+
+    function addYui(left, top, id) {
+      const yui = document.createElement('button');
+      yui.className = 'tiny-yui';
+      yui.style.left = left + '%';
+      yui.style.top = top + '%';
+      yui.textContent = '✦';
+      yui.title = 'Hidden Yui';
+      yui.onclick = () => {
+        if (state.foundYui.has(id)) return;
+        state.foundYui.add(id);
+        updateAffinity(6);
+        state.keyFragments += 1;
+        renderInventory();
+        showModal('Hidden Yui Found', 'Family complete. A secret key fragment was added to your inventory.');
+        yui.remove();
+      };
+      stage.appendChild(yui);
+    }
+
+    function maybeSpawnYui() {
+      if (state.floorIndex === 1 && !state.foundYui.has('y1')) addYui(10, 18, 'y1');
+      if (state.floorIndex === 2 && !state.foundYui.has('y2')) addYui(86, 22, 'y2');
+      if (state.floorIndex === 3 && !state.foundYui.has('y3')) addYui(16, 80, 'y3');
+      if (state.floorIndex === 4 && !state.foundYui.has('y4')) addYui(82, 78, 'y4');
+      if (state.floorIndex === 5 && !state.foundYui.has('y5')) addYui(46, 18, 'y5');
+    }
+
+    function renderChoices(floor) {
+      choiceList.innerHTML = '';
+      if (!floor.choices.length) return;
+      floor.choices.forEach((choice) => {
+        const btn = document.createElement('button');
+        btn.innerHTML = `<strong>${choice.label}</strong><small>${choice.detail}</small>`;
+        btn.onclick = () => {
+          updateAffinity(8);
+          state.heartsCollected += 1;
+          renderInventory();
+          showModal(choice.label, choice.response);
+          logText.textContent = choice.response;
+          questText.textContent = `Choice accepted: ${choice.label}.`;
+          dialogueText.textContent = choice.response;
+        };
+        choiceList.appendChild(btn);
+      });
+    }
+
+    function renderFloor() {
+      const floor = floors[state.floorIndex];
+      clearStage();
+      sceneBg.src = floor.bg;
+      sceneTitle.textContent = floor.title;
+      sceneSubtitle.textContent = floor.subtitle;
+      floorTag.textContent = `Floor ${floor.floor}/100`;
+      floorLabel.textContent = state.floorIndex === 4 ? 'Boss Stage' : state.floorIndex === 5 ? 'Ending Stage' : 'Quest Stage';
+      questText.textContent = floor.quest;
+      dialogueText.textContent = 'A system message will appear here.';
+      logText.textContent = floor.quest;
+      floatingNote.textContent = state.floorIndex === 4
+        ? 'The boss hits back. Keep your HP up and watch for the counterattack.'
+        : 'Click the glowing crystals. Click characters to talk. Unlock the ending by completing quests.';
+      renderChoices(floor);
+
+      battleBox.style.display = state.floorIndex === 4 ? 'block' : 'none';
+      updateBossHp(state.bossHp);
+      updatePlayerHp(state.playerHp);
+      battleTurnText.textContent = state.floorIndex === 4 ? 'Ready' : 'Waiting';
+      battleNote.textContent = state.floorIndex === 4 ? 'Each attack hurts the boss, but the boss fights back too.' : 'Clear the floors to unlock the final birthday reward.';
+
+      nextFloorBtn.disabled = state.floorIndex >= 5;
+      nextFloorBtn.textContent = state.floorIndex >= 5 ? 'Final floor reached' : 'Move to next floor';
+      revealEndingBtn.disabled = !(state.floorIndex === 5 && state.bossHp === 0);
+
+      floor.characters.forEach((char) => {
+        const btn = document.createElement('button');
+        btn.className = 'character';
+        btn.style.left = char.x + '%';
+        btn.style.top = char.y + '%';
+        btn.innerHTML = `<img src="${char.img}" alt="${char.label}" /><div class="char-label">${char.label}</div>`;
+        btn.onclick = () => {
+          dialogueText.textContent = char.message;
+          updateAffinity(4);
+          state.heartsCollected += 1;
+          renderInventory();
+          logText.textContent = char.message;
+        };
+        stage.appendChild(btn);
+      });
+
+      floor.crystals.forEach((crystal) => {
+        const btn = document.createElement('button');
+        btn.className = 'crystal';
+        btn.style.left = crystal.x + '%';
+        btn.style.top = crystal.y + '%';
+        btn.title = 'Memory Crystal';
+        btn.onclick = () => {
+          if (state.foundCrystalIds.has(crystal.id)) return;
+          state.foundCrystalIds.add(crystal.id);
+          state.crystalsCollected += 1;
+          updateAffinity(5);
+          state.heartsCollected += 1;
+          renderInventory();
+          showModal('Memory Crystal', crystal.message);
+          dialogueText.textContent = crystal.message;
+          logText.textContent = crystal.message;
+        };
+        stage.appendChild(btn);
+      });
+
+      maybeSpawnYui();
+    }
+
+    function nextFloor() {
+      if (state.floorIndex < 5) {
+        state.floorIndex += 1;
+        updateAffinity(5);
+        renderFloor();
+        if (state.floorIndex === 4) {
+          dialogueText.textContent = 'WARNING: FINAL BOSS DETECTED — Distance';
+          logText.textContent = 'A battle begins on Floor 90.';
+        }
+        if (state.floorIndex === 5) {
+          dialogueText.textContent = 'ALL FLOORS CLEARED';
+          logText.textContent = 'Open the ending reward when ready.';
+          updateAffinity(10);
+          revealEndingBtn.disabled = state.bossHp !== 0;
+        }
+      }
+    }
+
+    function resetGame() {
+      state.floorIndex = 0;
+      state.affinity = 0;
+      state.playerHp = 100;
+      state.bossHp = 100;
+      state.attackCount = 0;
+      state.reviveUsed = false;
+      state.crystalsCollected = 0;
+      state.heartsCollected = 0;
+      state.keyFragments = 0;
+      state.foundCrystalIds = new Set();
+      state.foundYui = new Set();
+      affinityValue.textContent = '0';
+      affinityBar.style.width = '0%';
+      renderInventory();
+      renderFloor();
+      endingModal.classList.add('hidden');
+      modal.classList.add('hidden');
+    }
+
+    function attackBoss() {
+      if (state.floorIndex !== 4 || state.bossHp <= 0) return;
+      state.attackCount += 1;
+
+      const bossDamage = 15;
+      const counterDamage = state.attackCount % 2 === 0 ? 11 : 8;
+      updateBossHp(state.bossHp - bossDamage);
+      updatePlayerHp(state.playerHp - counterDamage);
+      updateAffinity(4);
+      state.heartsCollected += 1;
+      renderInventory();
+
+      if (state.playerHp <= 20) {
+        battleTurnText.textContent = 'Critical!';
+        battleNote.textContent = 'Distance is pressuring you hard. Stay with it.';
+      } else {
+        battleTurnText.textContent = state.attackCount % 2 === 0 ? 'Counterattack!' : 'Press the attack!';
+        battleNote.textContent = 'Each strike matters. The boss hits back, but you can outlast it.';
+      }
+
+      if (state.playerHp <= 0) {
+        if (!state.reviveUsed) {
+          state.reviveUsed = true;
+          updatePlayerHp(35);
+          showModal('Asuna Rushes In', 'You were about to drop, but Asuna steadies you. One more push. You are not losing here.');
+        } else {
+          updatePlayerHp(18);
+          showModal('Still Standing', 'The boss lands a hard counter, but you refuse to fall. Keep going.');
+        }
+      }
+
+      if (state.bossHp === 0) {
+        state.keyFragments += 1;
+        renderInventory();
+        showModal('Boss Defeated', 'Distance has been cleared. The final floor is now accessible.');
+        battleTurnText.textContent = 'Defeated';
+        battleNote.textContent = 'The path to Floor 100 is open.';
+        if (state.floorIndex === 4) {
+          nextFloorBtn.disabled = false;
+        }
+      }
+      renderFloor();
+    }
+
+    function openEnding() {
+      if (!(state.floorIndex === 5 && state.bossHp === 0)) return;
+      endingText.textContent = `Dear Ricky,
+
+Congratulations. You've officially cleared every floor, recovered every memory crystal, and made it to the end of the quest. But honestly, the best part was never the victory screen. It was every day we spent together making our own little world feel special.
+
+From shivering through SlashCo, to anime nights, to Fortnite matches, to all the times we just hung out and comforted each other, you've given me so many memories I'll always keep close. Thank you for being my safe place, my favorite teammate, and the person who makes even the smallest moments feel like something worth remembering.
+
+So on your birthday, I just want to tell you how loved you are, how grateful I am for you, and how lucky I feel that I get to be part of your story. Happy Birthday, Ricky. ❤️
+
+Love,
+Your Asuna`;
+      endingModal.classList.remove('hidden');
+    }
+
+    function acceptQuest() {
+      bootScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      resetGame();
+    }
+
+    beginQuestBtn.onclick = acceptQuest;
+    skipBootBtn.onclick = acceptQuest;
+    modalCloseBtn.onclick = hideModal;
+    endingCloseBtn.onclick = () => endingModal.classList.add('hidden');
+    nextFloorBtn.onclick = nextFloor;
+    revealEndingBtn.onclick = openEnding;
+    resetBtn.onclick = resetGame;
+    attackBtn.onclick = attackBoss;
+    showHintBtn.onclick = () => {
+      const hintMap = [
+        'Hint: Click Asuna first, then find the crystals.',
+        'Hint: Try clicking every character and crystal on the stage.',
+        'Hint: Choose any of the three options — each one reveals a different message.',
+        'Hint: Collect all five hearts and watch for the hidden achievement.',
+        'Hint: Press ATTACK repeatedly. The boss will hit back, but you can survive it.',
+        'Hint: Open the final reward and read the ending.'
+      ];
+      showModal('Hint', hintMap[state.floorIndex] || 'Keep exploring.');
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hideModal();
+        endingModal.classList.add('hidden');
+      }
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) hideModal();
+      if (e.target === endingModal) endingModal.classList.add('hidden');
+    });
+
+    typeBoot(bootLines);
+    renderInventory();
+    renderFloor();
+  </script>
+</body>
+</html>
