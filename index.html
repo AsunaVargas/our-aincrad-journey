@@ -5,508 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Our Aincrad Quest</title>
   <style>
-    :root {
-      --bg: #050816;
-      --panel: rgba(10, 16, 32, 0.82);
-      --line: rgba(174, 194, 255, 0.16);
-      --text: #edf2ff;
-      --muted: rgba(237, 242, 255, 0.72);
-      --good: #86efac;
-      --danger: #fb7185;
-      --accent: #7dd3fc;
-      --accent-2: #f9a8d4;
-      --shadow: 0 24px 80px rgba(0,0,0,0.5);
+    :root{
+      --bg:#050816; --panel:rgba(10,16,32,.82); --line:rgba(174,194,255,.16);
+      --text:#edf2ff; --muted:rgba(237,242,255,.72); --good:#86efac;
+      --accent:#7dd3fc; --accent2:#f9a8d4; --shadow:0 24px 80px rgba(0,0,0,.5);
     }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at top,#101b3b,var(--bg) 55%);overflow-x:hidden}
+    button,input{font:inherit}.hidden{display:none!important}
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background: radial-gradient(circle at top, #101b3b, var(--bg) 55%);
-      overflow-x: hidden;
-    }
-    button, input { font: inherit; }
-    .hidden { display: none !important; }
+    .boot-screen{min-height:100vh;display:grid;place-items:center;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 40%,rgba(125,211,252,.18),transparent 24%),radial-gradient(circle at 20% 80%,rgba(249,168,212,.12),transparent 22%),linear-gradient(180deg,#020617,#0b1020 60%,#050816)}
+    .boot-screen::before,.boot-screen::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:52px 52px;opacity:.12;mask-image:radial-gradient(circle at center,black 34%,transparent 80%)}
+    .boot-card{position:relative;z-index:2;width:min(920px,calc(100vw - 32px));border:1px solid var(--line);border-radius:28px;background:rgba(2,6,23,.74);backdrop-filter:blur(16px);box-shadow:var(--shadow);padding:28px}
+    .boot-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+    .boot-title{margin:0;font-size:clamp(28px,5vw,60px);letter-spacing:.1em;text-transform:uppercase}
+    .boot-pill{padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+    .boot-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    @media (max-width:900px){.boot-grid{grid-template-columns:1fr}}
+    .boot-terminal,.boot-status{border:1px solid rgba(255,255,255,.1);border-radius:24px;background:rgba(8,12,24,.86);padding:18px;min-height:240px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+    .boot-line{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.9;color:rgba(237,242,255,.86);white-space:pre-wrap;min-height:170px}
+    .boot-progress{margin-top:16px;height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08)}
+    .boot-progress>span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:inherit;transition:width .25s ease}
+    .boot-status h3{margin:0 0 10px;text-transform:uppercase;letter-spacing:.16em;font-size:14px;color:var(--muted)}
+    .status-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;font-size:14px;color:rgba(237,242,255,.8)}
+    .status-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:12px}
+    .status-bar>span{display:block;height:100%;width:100%;background:linear-gradient(90deg,#86efac,#22c55e)}
+    .boot-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
 
-    /* Intro screen */
-    .boot-screen {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 50% 40%, rgba(125,211,252,0.18), transparent 24%),
-        radial-gradient(circle at 20% 80%, rgba(249,168,212,0.12), transparent 22%),
-        linear-gradient(180deg, #020617, #0b1020 60%, #050816);
-    }
-    .boot-screen::before,
-    .boot-screen::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 52px 52px;
-      opacity: 0.12;
-      mask-image: radial-gradient(circle at center, black 34%, transparent 80%);
-    }
-    .boot-card {
-      position: relative;
-      z-index: 2;
-      width: min(920px, calc(100vw - 32px));
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      background: rgba(2, 6, 23, 0.74);
-      backdrop-filter: blur(16px);
-      box-shadow: var(--shadow);
-      padding: 28px;
-    }
-    .boot-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .boot-title {
-      margin: 0;
-      font-size: clamp(28px, 5vw, 60px);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .boot-pill {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-    }
-    .boot-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
-    }
-    @media (max-width: 900px) { .boot-grid { grid-template-columns: 1fr; } }
-    .boot-terminal,
-    .boot-status {
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 24px;
-      background: rgba(8, 12, 24, 0.86);
-      padding: 18px;
-      min-height: 240px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
-    }
-    .boot-line {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 14px;
-      line-height: 1.9;
-      color: rgba(237,242,255,0.86);
-      white-space: pre-wrap;
-      min-height: 170px;
-    }
-    .boot-progress {
-      margin-top: 16px;
-      height: 12px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.08);
-    }
-    .boot-progress > span {
-      display: block;
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      border-radius: inherit;
-      transition: width 0.25s ease;
-    }
-    .boot-status h3 {
-      margin: 0 0 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 14px;
-      color: var(--muted);
-    }
-    .status-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 14px;
-      color: rgba(237,242,255,0.8);
-    }
-    .status-bar {
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-    .status-bar > span { display:block; height:100%; width:100%; background: linear-gradient(90deg, #86efac, #22c55e); }
-    .boot-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 18px;
-    }
+    .game-screen{min-height:100vh;padding:18px}
+    .layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px}
+    @media (max-width:1024px){.layout{grid-template-columns:1fr}}
+    .panel,.modal-card,.gallery,.heal-toast{border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(14px);box-shadow:var(--shadow);border-radius:24px}
+    .sidebar{padding:18px;display:flex;flex-direction:column;gap:14px;position:sticky;top:18px;align-self:start}
+    .brand{display:flex;justify-content:space-between;gap:12px;align-items:center;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .brand h1{margin:0;font-size:20px;letter-spacing:.08em;text-transform:uppercase}
+    .chip{display:inline-flex;align-items:center;gap:8px;width:fit-content;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.07);color:var(--muted);font-size:12px}
+    .meter{padding:14px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+    .meter-head,.health-head,.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .meter-title,.section-label{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .meter-value{font-size:15px;color:var(--good)}
+    .bar,.health-bar{height:12px;margin-top:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08)}
+    .bar>span,.health-bar>span{display:block;height:100%;width:0%;border-radius:inherit;transition:width .25s ease}
+    .affinity-fill{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+    .player-fill{background:linear-gradient(90deg,#86efac,#22c55e)}
+    .boss-fill{background:linear-gradient(90deg,#fb7185,#f43f5e)}
+    .inventory,.quest,.choices,.log,.boss-card,.gallery{padding:16px;border-radius:24px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04)}
+    .inventory h2,.quest h2,.choices h2,.log h2,.boss-card h2,.gallery h2{margin:0 0 12px;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .items{display:flex;flex-wrap:wrap;gap:10px}
+    .item{padding:10px 12px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);font-size:13px}
+    .quest p,.log p,.boss-card p,.dialogue p,.gallery p{margin:0;color:rgba(237,242,255,.82);line-height:1.75;font-size:14px;white-space:pre-wrap}
+    .controls{display:flex;flex-wrap:wrap;gap:10px}
+    .btn{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:var(--text);border-radius:999px;padding:12px 16px;cursor:pointer;transition:transform .15s ease,background .15s ease,border-color .15s ease}
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.14)}
+    .btn.primary{background:linear-gradient(90deg,rgba(125,211,252,.22),rgba(249,168,212,.22));border-color:rgba(125,211,252,.32)}
+    .btn.good{border-color:rgba(134,239,172,.34)}
+    .btn:disabled{opacity:.42;cursor:not-allowed;transform:none}
 
-    /* Main game */
-    .game-screen { min-height: 100vh; padding: 18px; }
-    .layout {
-      display: grid;
-      grid-template-columns: 320px minmax(0, 1fr);
-      gap: 18px;
-    }
-    @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
-    .panel,
-    .modal-card,
-    .gallery {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
-      border-radius: 24px;
-    }
-    .sidebar {
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      position: sticky;
-      top: 18px;
-      align-self: start;
-    }
-    .brand {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .brand h1 {
-      margin: 0;
-      font-size: 20px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.07);
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .meter {
-      padding: 14px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-    .meter-head,
-    .health-head,
-    .topbar {
-      display:flex; justify-content:space-between; align-items:center; gap: 12px; flex-wrap: wrap;
-    }
-    .meter-title,
-    .section-label {
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .meter-value { font-size: 15px; color: var(--good); }
-    .bar,
-    .health-bar {
-      height: 12px;
-      margin-top: 10px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.08);
-    }
-    .bar > span,
-    .health-bar > span {
-      display:block; height:100%; width:0%; border-radius:inherit;
-      transition: width .25s ease;
-    }
-    .affinity-fill { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
-    .player-fill { background: linear-gradient(90deg, #86efac, #22c55e); }
-    .boss-fill { background: linear-gradient(90deg, #fb7185, #f43f5e); }
-    .inventory,
-    .quest,
-    .choices,
-    .log,
-    .boss-card,
-    .gallery {
-      padding: 16px;
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-    }
-    .inventory h2,
-    .quest h2,
-    .choices h2,
-    .log h2,
-    .boss-card h2,
-    .gallery h2 {
-      margin: 0 0 12px;
-      font-size: 15px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .items { display:flex; flex-wrap:wrap; gap: 10px; }
-    .item {
-      padding: 10px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.08);
-      font-size: 13px;
-    }
-    .quest p,
-    .log p,
-    .boss-card p,
-    .dialogue p,
-    .gallery p { margin: 0; color: rgba(237,242,255,0.82); line-height: 1.75; font-size: 14px; white-space: pre-wrap; }
-    .controls { display:flex; flex-wrap:wrap; gap: 10px; }
-    .btn {
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-    }
-    .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); }
-    .btn.primary { background: linear-gradient(90deg, rgba(125,211,252,0.22), rgba(249,168,212,0.22)); border-color: rgba(125,211,252,0.32); }
-    .btn.good { border-color: rgba(134,239,172,0.34); }
-    .btn.danger { border-color: rgba(251,113,133,0.34); }
-    .btn:disabled { opacity: .42; cursor: not-allowed; transform: none; }
+    .content{min-width:0}
+    .content-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+    .content-top h2{margin:0;font-size:clamp(24px,3.5vw,42px);line-height:1.05;letter-spacing:.02em}
+    .content-top .sub{color:var(--muted);margin-top:6px;font-size:14px}
+    .stage-shell{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:16px}
+    @media (max-width:1100px){.stage-shell{grid-template-columns:1fr}}
+    .stage{position:relative;min-height:720px;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:radial-gradient(circle at top,rgba(125,211,252,.16),transparent 28%),linear-gradient(180deg,rgba(7,13,28,.28),rgba(2,6,23,.86))}
+    .stage-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28;filter:saturate(1.02) contrast(1.04)}
+    .stage-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(2,6,23,.88))}
+    .stage-grid{position:relative;z-index:2;min-height:100%;padding:18px}
+    .scanlines::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:100% 4px;opacity:.07;pointer-events:none}
+    .floor-tag,.stage-note,.mode-chip{position:absolute;z-index:3;padding:10px 14px;border-radius:999px;border:1px solid rgba(125,211,252,.2);background:rgba(2,6,23,.62);color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+    .floor-tag{top:16px;left:16px}
+    .stage-note{top:16px;right:16px;max-width:320px;text-align:right}
+    .mode-chip{left:16px;bottom:92px}
+    .stage-layer{position:absolute;inset:0}
+    .yui-token{position:absolute;width:26px;height:26px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(125,211,252,.14);color:#eaf6ff;box-shadow:0 0 14px rgba(125,211,252,.25);display:grid;place-items:center;font-size:14px;cursor:pointer;animation:drift 4s ease-in-out infinite;z-index:6}
+    @keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    .mini-avatars{position:absolute;left:18px;bottom:18px;z-index:7;display:flex;gap:10px;align-items:flex-end}
+    .mini-stack{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .mini{width:56px;height:56px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.35);display:grid;place-items:center;box-shadow:0 14px 30px rgba(0,0,0,.28)}
+    .mini img{width:100%;height:100%;object-fit:contain;display:block}
+    .mini-label{display:block;margin-top:6px;font-size:10px;color:rgba(237,242,255,.78);text-align:center}
 
-    .content { min-width: 0; }
-    .content-top { display:flex; justify-content:space-between; gap: 12px; align-items:flex-start; flex-wrap: wrap; margin-bottom: 14px; }
-    .content-top h2 { margin: 0; font-size: clamp(24px, 3.5vw, 42px); line-height: 1.05; letter-spacing: 0.02em; }
-    .content-top .sub { color: var(--muted); margin-top: 6px; font-size: 14px; }
-    .stage-shell { display:grid; grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr); gap: 16px; }
-    @media (max-width: 1100px) { .stage-shell { grid-template-columns: 1fr; } }
-    .stage {
-      position: relative;
-      min-height: 720px;
-      border-radius: 28px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.1);
-      background:
-        radial-gradient(circle at top, rgba(125,211,252,0.16), transparent 28%),
-        linear-gradient(180deg, rgba(7,13,28,0.28), rgba(2,6,23,0.86));
-    }
-    .stage-bg {
-      position:absolute; inset:0;
-      width:100%; height:100%; object-fit:cover;
-      opacity:.28; filter:saturate(1.02) contrast(1.04);
-    }
-    .stage-overlay { position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(2,6,23,0.88)); }
-    .stage-grid { position: relative; z-index: 2; min-height: 100%; padding: 18px; }
-    .scanlines::before { content:""; position:absolute; inset:0; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 100% 4px; opacity: .07; pointer-events:none; }
-    .floor-tag,
-    .stage-note {
-      position:absolute; z-index:3;
-      padding: 10px 14px; border-radius: 999px;
-      border:1px solid rgba(125,211,252,0.2);
-      background: rgba(2,6,23,0.62);
-      color: var(--muted);
-      font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
-    }
-    .floor-tag { top: 16px; left: 16px; }
-    .stage-note { top: 16px; right: 16px; max-width: 320px; text-align:right; }
-    .stage-layer { position:absolute; inset:0; }
+    .right-col{display:flex;flex-direction:column;gap:14px}
+    .dialogue,.boss-card,.choices,.log,.gallery{padding:16px}
+    .dialogue h3,.log h3,.choices h3,.boss-card h3,.gallery h3{margin:0 0 10px;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .choice-list{display:grid;gap:10px;margin-top:12px}
+    .choice-list button{text-align:left;border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;transition:transform .15s ease,background .15s ease}
+    .choice-list button:hover{transform:translateY(-1px);background:rgba(255,255,255,.11)}
+    .choice-list small{display:block;color:var(--muted);line-height:1.5;margin-top:5px}
+    .choice-list .chip{width:100%;justify-content:center}
 
-    .yui-token {
-      position:absolute;
-      width: 26px; height: 26px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(125,211,252,0.14);
-      color: #eaf6ff;
-      box-shadow: 0 0 14px rgba(125,211,252,0.25);
-      display:grid;
-      place-items:center;
-      font-size: 14px;
-      cursor:pointer;
-      animation: drift 4s ease-in-out infinite;
-      z-index: 6;
-    }
-    @keyframes drift { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .boss-card{display:none}
+    .boss-title-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .boss-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(251,113,133,.28);background:rgba(251,113,133,.08);color:#fecdd3;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+    .hp-line{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;color:var(--muted);font-size:13px}
+    .hp-meter{height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08)}
+    .hp-meter>span{display:block;height:100%;width:100%;border-radius:inherit;transition:width .2s ease}
+    .battle-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 
-    .mini-avatars {
-      position:absolute;
-      left: 18px;
-      bottom: 18px;
-      z-index: 7;
-      display:flex;
-      gap: 10px;
-      align-items:flex-end;
-    }
-    .mini-stack { display:flex; flex-direction:column; align-items:center; gap: 4px; }
-    .mini {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.35);
-      display:grid;
-      place-items:center;
-      box-shadow: 0 14px 30px rgba(0,0,0,0.28);
-    }
-    .mini img { width: 100%; height: 100%; object-fit: contain; display:block; }
-    .mini-label { display:block; margin-top: 6px; font-size: 10px; color: rgba(237,242,255,0.78); text-align:center; }
-    .mode-chip {
-      position:absolute;
-      left: 18px;
-      bottom: 88px;
-      z-index: 7;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.35);
-      color: rgba(237,242,255,0.82);
-      font-size: 11px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
+    .gallery{display:none}
+    .gallery-track{overflow:hidden;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+    .gallery-strip{display:flex;gap:12px;width:max-content;animation:scrollGallery 26s linear infinite;padding:12px}
+    .gallery-strip:hover{animation-play-state:paused}
+    .gallery-card{width:170px;flex:0 0 auto;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.22)}
+    .gallery-card img{width:100%;height:120px;object-fit:cover;display:block}
+    .gallery-card p{margin:0;padding:10px 12px;font-size:12px;color:rgba(237,242,255,.75)}
+    @keyframes scrollGallery{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-    .right-col { display:flex; flex-direction:column; gap: 14px; }
-    .dialogue,
-    .boss-card,
-    .choices,
-    .log,
-    .gallery { padding: 16px; }
-    .dialogue h3,
-    .log h3,
-    .choices h3,
-    .boss-card h3,
-    .gallery h3 {
-      margin: 0 0 10px;
-      font-size: 15px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .choice-list { display:grid; gap: 10px; margin-top: 12px; }
-    .choice-list button {
-      text-align:left;
-      border-radius: 16px;
-      padding: 14px;
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      cursor:pointer;
-      transition: transform .15s ease, background .15s ease;
-    }
-    .choice-list button:hover { transform: translateY(-1px); background: rgba(255,255,255,0.11); }
-    .choice-list small { display:block; color: var(--muted); line-height:1.5; margin-top:5px; }
-    .choice-list .chip { width:100%; justify-content:center; }
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,.82);backdrop-filter:blur(16px);display:grid;place-items:center;padding:20px;z-index:40}
+    .modal-card{width:min(760px,calc(100vw - 24px));padding:20px;background:rgba(5,11,27,.95);border-radius:26px}
+    .modal-card h3{margin:0 0 10px;font-size:20px;letter-spacing:.06em;text-transform:uppercase}
+    .modal-body{margin:0;color:rgba(237,242,255,.84);line-height:1.8}
+    .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .modal-visual{display:grid;gap:12px;grid-template-columns:1fr;margin-bottom:12px}
+    .modal-visual img{width:100%;max-height:320px;object-fit:contain;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:18px}
+    .battle-preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .battle-preview img{height:220px;object-fit:contain;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:18px;width:100%}
 
-    .boss-card { display:none; }
-    .boss-title-row { display:flex; justify-content:space-between; gap: 12px; align-items:flex-start; flex-wrap: wrap; }
-    .boss-badge {
-      display:inline-flex; align-items:center; gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border:1px solid rgba(251,113,133,0.28);
-      background: rgba(251,113,133,0.08);
-      color:#fecdd3;
-      font-size:12px;
-      letter-spacing:.12em; text-transform: uppercase;
-    }
-    .hp-line { display:flex; justify-content:space-between; align-items:center; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 13px; }
-    .hp-meter { height: 12px; border-radius: 999px; overflow:hidden; background: rgba(255,255,255,0.08); }
-    .hp-meter > span { display:block; height:100%; width:100%; border-radius:inherit; transition: width .2s ease; }
-    .battle-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top: 14px; }
-
-    .gallery { display:none; }
-    .gallery-track { overflow:hidden; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
-    .gallery-strip { display:flex; gap: 12px; width: max-content; animation: scrollGallery 26s linear infinite; padding: 12px; }
-    .gallery-strip:hover { animation-play-state: paused; }
-    .gallery-card {
-      width: 170px;
-      flex: 0 0 auto;
-      border-radius: 16px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.22);
-    }
-    .gallery-card img { width: 100%; height: 120px; object-fit: cover; display:block; }
-    .gallery-card p { margin: 0; padding: 10px 12px; font-size: 12px; color: rgba(237,242,255,0.75); }
-    @keyframes scrollGallery { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 6, 23, 0.82);
-      backdrop-filter: blur(16px);
-      display:grid;
-      place-items:center;
-      padding: 20px;
-      z-index: 40;
-    }
-    .modal-card {
-      width: min(760px, calc(100vw - 24px));
-      padding: 20px;
-      background: rgba(5,11,27,0.95);
-      border-radius: 26px;
-    }
-    .modal-card h3 { margin: 0 0 10px; font-size: 20px; letter-spacing: .06em; text-transform: uppercase; }
-    .modal-body { margin: 0; color: rgba(237,242,255,0.84); line-height: 1.8; }
-    .modal-actions { display:flex; justify-content:flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-    .modal-visual {
-      display:grid;
-      gap: 12px;
-      grid-template-columns: 1fr;
-      margin-bottom: 12px;
-    }
-    .modal-visual img {
-      width: 100%;
-      max-height: 320px;
-      object-fit: contain;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-    }
-    .battle-preview { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .battle-preview img { height: 220px; object-fit: contain; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; width: 100%; }
-
-    .heal-toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 50;
-      width: min(360px, calc(100vw - 36px));
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(5,11,27,0.94);
-      box-shadow: var(--shadow);
-      padding: 12px;
-      opacity: 0;
-      transform: translateY(12px);
-      pointer-events: none;
-      transition: opacity .22s ease, transform .22s ease;
-    }
-    .heal-toast.show { opacity: 1; transform: translateY(0); }
-    .heal-toast img { width: 100%; height: 180px; object-fit: contain; display:block; border-radius: 16px; background: rgba(255,255,255,0.03); }
-    .heal-toast p { margin: 10px 2px 2px; color: rgba(237,242,255,0.84); font-size: 13px; line-height: 1.6; }
+    .heal-toast{position:fixed;right:18px;bottom:18px;z-index:50;width:min(360px,calc(100vw - 36px));border-radius:22px;border:1px solid rgba(255,255,255,.12);background:rgba(5,11,27,.94);box-shadow:var(--shadow);padding:12px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .22s ease,transform .22s ease}
+    .heal-toast.show{opacity:1;transform:translateY(0)}
+    .heal-toast img{width:100%;height:180px;object-fit:contain;display:block;border-radius:16px;background:rgba(255,255,255,.03)}
+    .heal-toast p{margin:10px 2px 2px;color:rgba(237,242,255,.84);font-size:13px;line-height:1.6}
   </style>
 </head>
 <body>
@@ -542,31 +160,17 @@
   <section id="gameScreen" class="game-screen hidden">
     <div class="layout">
       <aside class="panel sidebar">
-        <div class="brand">
-          <h1>Our Aincrad</h1>
-          <span class="chip">Quest Game</span>
-        </div>
-
+        <div class="brand"><h1>Our Aincrad</h1><span class="chip">Quest Game</span></div>
         <div class="meter">
           <div class="meter-head"><span class="meter-title">Affinity</span><span class="meter-value"><span id="affinityValue">0</span>%</span></div>
           <div class="bar"><span class="affinity-fill" id="affinityBar"></span></div>
         </div>
-
         <div class="meter">
           <div class="health-head"><span class="meter-title">Player HP</span><span id="playerHpText">100</span></div>
           <div class="health-bar"><span class="player-fill" id="playerHpBar"></span></div>
         </div>
-
-        <div class="inventory">
-          <h2>Inventory</h2>
-          <div class="items" id="inventoryItems"></div>
-        </div>
-
-        <div class="quest">
-          <h2>Current Quest</h2>
-          <p id="questText"></p>
-        </div>
-
+        <div class="inventory"><h2>Inventory</h2><div class="items" id="inventoryItems"></div></div>
+        <div class="quest"><h2>Current Quest</h2><p id="questText"></p></div>
         <div class="controls">
           <button class="btn good" id="nextBtn">Move to next floor</button>
           <button class="btn primary" id="endingBtn" disabled>Open final reward</button>
@@ -577,10 +181,7 @@
 
       <main class="content">
         <div class="content-top">
-          <div>
-            <h2 id="chapterTitle">Floor 1 — The Beginning</h2>
-            <div class="sub" id="chapterSub">A quiet start in Aincrad.</div>
-          </div>
+          <div><h2 id="chapterTitle">Floor 1 — The Beginning</h2><div class="sub" id="chapterSub">A quiet start in Aincrad.</div></div>
           <div class="chip" id="floorChip">Floor 1/100</div>
         </div>
 
@@ -594,43 +195,23 @@
               <div class="stage-layer" id="stageLayer"></div>
               <div class="mode-chip" id="modeChip">SAO MODE</div>
               <div class="mini-avatars">
-                <div class="mini-stack">
-                  <div class="mini"><img id="kiritoMini" src="Kirito dual wield sao.jpg" alt="Kirito avatar"></div>
-                  <span class="mini-label">Kirito</span>
-                </div>
-                <div class="mini-stack hidden" id="asunaMiniWrap">
-                  <div class="mini"><img id="asunaMini" src="Asuna sao.jpg" alt="Asuna avatar"></div>
-                  <span class="mini-label">Asuna</span>
-                </div>
+                <div class="mini-stack"><div class="mini"><img id="kiritoMini" src="Kirito dual wield sao.jpg" alt="Kirito avatar"></div><span class="mini-label">Kirito</span></div>
+                <div class="mini-stack hidden" id="asunaMiniWrap"><div class="mini"><img id="asunaMini" src="Asuna sao.jpg" alt="Asuna avatar"></div><span class="mini-label">Asuna</span></div>
               </div>
             </div>
           </section>
 
           <section class="right-col">
-            <div class="panel dialogue">
-              <h3>System Dialogue</h3>
-              <p id="dialogueText">The system is waiting.</p>
-            </div>
-
-            <div class="panel log">
-              <h3>Quest Log</h3>
-              <p id="logText">The quest will appear here.</p>
-            </div>
-
-            <div class="panel choices">
-              <h3>Actions</h3>
-              <div class="choice-list" id="choiceList"></div>
-            </div>
+            <div class="panel dialogue"><h3>System Dialogue</h3><p id="dialogueText">The system is waiting.</p></div>
+            <div class="panel log"><h3>Quest Log</h3><p id="logText">The quest will appear here.</p></div>
+            <div class="panel choices"><h3>Actions</h3><div class="choice-list" id="choiceList"></div></div>
 
             <div class="panel boss-card" id="bossCard">
               <div class="boss-title-row">
-                <div>
-                  <div class="boss-badge" id="bossBadge">Boss Fight</div>
-                  <h3 id="bossName" style="margin-top:10px; font-size: 22px; text-transform:none; letter-spacing:0; color: var(--text);">Boss</h3>
-                </div>
+                <div><div class="boss-badge" id="bossBadge">Boss Fight</div><h3 id="bossName" style="margin-top:10px;font-size:22px;text-transform:none;letter-spacing:0;color:var(--text)">Boss</h3></div>
                 <div class="chip" id="bossSource">Show</div>
               </div>
-              <p id="bossIntro" style="margin-top: 10px;"></p>
+              <p id="bossIntro" style="margin-top:10px;"></p>
               <div class="hp-line"><span>Boss HP</span><span id="bossHpText">100</span></div>
               <div class="hp-meter"><span class="boss-fill" id="bossHpBar"></span></div>
               <div class="battle-actions">
@@ -642,9 +223,7 @@
             <div class="panel gallery" id="galleryPanel">
               <h3>Ending Gallery</h3>
               <p>The pictures rotate here at the end of the journey.</p>
-              <div class="gallery-track" style="margin-top:12px;">
-                <div class="gallery-strip" id="galleryStrip"></div>
-              </div>
+              <div class="gallery-track" style="margin-top:12px;"><div class="gallery-strip" id="galleryStrip"></div></div>
             </div>
           </section>
         </div>
@@ -656,9 +235,7 @@
     <div class="modal-card">
       <h3 id="modalTitle">Message</h3>
       <div class="modal-body" id="modalBody"></div>
-      <div class="modal-actions">
-        <button class="btn primary" id="modalCloseBtn">Close</button>
-      </div>
+      <div class="modal-actions"><button class="btn primary" id="modalCloseBtn">Close</button></div>
     </div>
   </div>
 
@@ -696,272 +273,54 @@
     ];
 
     const chapters = [
-      {
-        floor: 1,
-        title: "Floor 1 — The Beginning",
-        sub: "A quiet start in Aincrad.",
-        quest: "Collect the hidden Yui fragments to unlock the path to the first boss.",
-        note: "Only Yui fragments are visible here. The combat starts after Floor 1.",
-        tokens: [
-          { x: 17, y: 28 },
-          { x: 43, y: 58 },
-          { x: 73, y: 24 },
-          { x: 77, y: 72 }
-        ],
-        boss: null
-      },
-      {
-        floor: 25,
-        title: "Floor 25 — Illfang the Kobold Lord",
-        sub: "Rick gets dual wielding Kirito first.",
-        quest: "Collect all fragments, then defeat Illfang. Joint Attack is available.",
-        note: "SAO avatars are active. If the joint attack is chosen here, it counts toward the team buff.",
-        tokens: [
-          { x: 14, y: 70 },
-          { x: 31, y: 36 },
-          { x: 60, y: 22 },
-          { x: 83, y: 66 }
-        ],
-        boss: {
-          name: "Illfang the Kobold Lord",
-          source: "SAO",
-          hp: 80,
-          damage: 10,
-          art: "Illfang the Kobold Lord.jpg",
-          intro: "The first boss emerges from the dark. Kirito fights first, then Asuna joins the battle.",
-          heal: "Asuna heals you after the fight, and the first shared victory starts the journey."
-        }
-      },
-      {
-        floor: 50,
-        title: "Floor 50 — The Gleam Eyes",
-        sub: "A deeper test of trust.",
-        quest: "Collect all fragments, then clear The Gleam Eyes. Joint Attack is still available.",
-        note: "The second boss keeps the SAO setup going. Choose joint attacks if you want the buff later.",
-        tokens: [
-          { x: 16, y: 26 },
-          { x: 26, y: 72 },
-          { x: 50, y: 42 },
-          { x: 73, y: 22 },
-          { x: 86, y: 72 }
-        ],
-        boss: {
-          name: "The Gleam Eyes",
-          source: "SAO",
-          hp: 95,
-          damage: 12,
-          art: "the gleam eyes.jpg",
-          intro: "The giant eyes lock onto you. Keep attacking and choose joint attack when you want extra damage.",
-          heal: "Asuna heals you again. The fight is getting stronger, but so are you."
-        }
-      },
-      {
-        floor: 75,
-        title: "Floor 75 — Skull Reaper",
-        sub: "The final SAO-era joint attack.",
-        quest: "Collect all fragments, then defeat Skull Reaper. This is the last floor with Joint Attack.",
-        note: "If you choose joint attack three times by now, the Asuna buff activates and the avatars switch to ALO.",
-        tokens: [
-          { x: 18, y: 28 },
-          { x: 42, y: 18 },
-          { x: 58, y: 64 },
-          { x: 80, y: 38 }
-        ],
-        boss: {
-          name: "Skull Reaper",
-          source: "SAO",
-          hp: 110,
-          damage: 14,
-          art: "skull reaper.jpg",
-          intro: "The Skull Reaper towers over the field. One more Joint Attack here can finish the buff sequence.",
-          heal: "Asuna heals you after the fight, and the castle finally shifts into the next phase."
-        }
-      },
-      {
-        floor: 90,
-        title: "Floor 90 — Oberon",
-        sub: "ALO mode begins.",
-        quest: "Collect the fragments, survive Oberon, and let Asuna heal you continuously.",
-        note: "Your avatars change into ALO mode here. The first attack uses Kirito's ALO attack art.",
-        tokens: [
-          { x: 13, y: 24 },
-          { x: 30, y: 62 },
-          { x: 52, y: 34 },
-          { x: 73, y: 76 },
-          { x: 88, y: 28 }
-        ],
-        boss: {
-          name: "Oberon",
-          source: "ALO",
-          hp: 125,
-          damage: 22,
-          art: "Oberon.jpg",
-          intro: "The fairy king appears. The first attack flashes Kirito's ALO attack art, and the counterattacks hit hard.",
-          heal: "Asuna's ALO healer appears and keeps restoring your HP until the fight ends."
-        }
-      },
-      {
-        floor: 100,
-        title: "Floor 100 — Quinella",
-        sub: "The final boss and the birthday reveal.",
-        quest: "Collect the last fragments, defeat Quinella, and open the final reward.",
-        note: "Final avatars are alicization versions. The gallery unlocks after Quinella falls.",
-        tokens: [
-          { x: 16, y: 28 },
-          { x: 43, y: 56 },
-          { x: 70, y: 22 }
-        ],
-        boss: {
-          name: "Quinella",
-          source: "Alicization",
-          hp: 140,
-          damage: 24,
-          art: "quinella.jpg",
-          intro: "The last boss waits at the end of the story. Kirito and Asuna now stand in their alicization forms.",
-          heal: "Asuna keeps you standing one last time. The final reward is almost here."
-        }
-      }
+      { floor: 1, title: "Floor 1 — The Beginning", sub: "A quiet start in Aincrad.", quest: "Collect the hidden Yui fragments to unlock the path to the first boss.", note: "Only Yui fragments are visible here. The combat starts after Floor 1.", tokens: [{ x: 17, y: 28 }, { x: 43, y: 58 }, { x: 73, y: 24 }, { x: 77, y: 72 }], boss: null },
+      { floor: 25, title: "Floor 25 — Illfang the Kobold Lord", sub: "Rick gets dual wielding Kirito first.", quest: "Collect all fragments, then defeat Illfang. Joint Attack is available.", note: "SAO avatars are active. If the joint attack is chosen here, it counts toward the team buff.", tokens: [{ x: 14, y: 70 }, { x: 31, y: 36 }, { x: 60, y: 22 }, { x: 83, y: 66 }], boss: { name: "Illfang the Kobold Lord", source: "SAO", hp: 80, damage: 10, art: "Illfang the Kobold Lord.jpg", intro: "The first boss emerges from the dark. Kirito fights first, then Asuna joins the battle.", heal: "Asuna heals you after the fight, and the first shared victory starts the journey." } },
+      { floor: 50, title: "Floor 50 — The Gleam Eyes", sub: "A deeper test of trust.", quest: "Collect all fragments, then clear The Gleam Eyes. Joint Attack is still available.", note: "The second boss keeps the SAO setup going. Choose joint attacks if you want the buff later.", tokens: [{ x: 16, y: 26 }, { x: 26, y: 72 }, { x: 50, y: 42 }, { x: 73, y: 22 }, { x: 86, y: 72 }], boss: { name: "The Gleam Eyes", source: "SAO", hp: 95, damage: 12, art: "the gleam eyes.jpg", intro: "The giant eyes lock onto you. Keep attacking and choose joint attack when you want extra damage.", heal: "Asuna heals you again. The fight is getting stronger, but so are you." } },
+      { floor: 75, title: "Floor 75 — Skull Reaper", sub: "The final SAO-era joint attack.", quest: "Collect all fragments, then defeat Skull Reaper. This is the last floor with Joint Attack.", note: "If you choose joint attack three times by now, the Asuna buff activates and the avatars switch to ALO.", tokens: [{ x: 18, y: 28 }, { x: 42, y: 18 }, { x: 58, y: 64 }, { x: 80, y: 38 }], boss: { name: "Skull Reaper", source: "SAO", hp: 110, damage: 14, art: "skull reaper.jpg", intro: "The Skull Reaper towers over the field. One more Joint Attack here can finish the buff sequence.", heal: "Asuna heals you after the fight, and the castle finally shifts into the next phase." } },
+      { floor: 90, title: "Floor 90 — Oberon", sub: "ALO mode begins.", quest: "Collect the fragments, survive Oberon, and let Asuna heal you continuously.", note: "Your avatars change into ALO mode here. The first attack uses Kirito's ALO attack art.", tokens: [{ x: 13, y: 24 }, { x: 30, y: 62 }, { x: 52, y: 34 }, { x: 73, y: 76 }, { x: 88, y: 28 }], boss: { name: "Oberon", source: "ALO", hp: 125, damage: 22, art: "Oberon.jpg", intro: "The fairy king appears. The first attack flashes Kirito's ALO attack art, and the counterattacks hit hard.", heal: "Asuna's ALO healer appears and keeps restoring your HP until the fight ends." } },
+      { floor: 100, title: "Floor 100 — Quinella", sub: "The final boss and the birthday reveal.", quest: "Collect the last fragments, defeat Quinella, and open the final reward.", note: "Final avatars are alicization versions. The gallery unlocks after Quinella falls.", tokens: [{ x: 16, y: 28 }, { x: 43, y: 56 }, { x: 70, y: 22 }], boss: { name: "Quinella", source: "Alicization", hp: 140, damage: 24, art: "quinella.jpg", intro: "The last boss waits at the end of the story. Kirito and Asuna now stand in their alicization forms.", heal: "Asuna keeps you standing one last time. The final reward is almost here." } }
     ];
 
-    const state = {
-      chapterIndex: 0,
-      affinity: 0,
-      playerHp: 100,
-      bossHp: 0,
-      bossMaxHp: 0,
-      floorTokens: 0,
-      totalTokens: 0,
-      bossCleared: false,
-      buffActive: false,
-      jointCount: 0,
-      asunaVisible: false,
-      healCount: 0,
-      galleryUnlocked: false,
-      lastIntroShown: -1,
-      aloAttackShown: false,
-      modalAction: null,
-      healTimer: null,
-      currentMode: "sao"
-    };
+    const state = { chapterIndex: 0, affinity: 0, playerHp: 100, bossHp: 0, bossMaxHp: 0, floorTokens: 0, totalTokens: 0, bossCleared: false, buffActive: false, jointCount: 0, asunaVisible: false, healCount: 0, galleryUnlocked: false, lastIntroShown: -1, aloAttackShown: false, healTimer: null, _modalAction: null };
 
     const el = (id) => document.getElementById(id);
-    const bootScreen = el("bootScreen");
-    const gameScreen = el("gameScreen");
-    const bootLinesEl = el("bootLines");
-    const bootProgress = el("bootProgress");
-    const bootStatus = el("bootStatus");
-    const linkState = el("linkState");
-    const linkBar = el("linkBar");
-    const beginBtn = el("beginBtn");
-    const skipBtn = el("skipBtn");
-    const bootTokenCount = el("bootTokenCount");
-    const chapterTitle = el("chapterTitle");
-    const chapterSub = el("chapterSub");
-    const floorChip = el("floorChip");
-    const stageBg = el("stageBg");
-    const floorTag = el("floorTag");
-    const stageNote = el("stageNote");
-    const stageLayer = el("stageLayer");
-    const dialogueText = el("dialogueText");
-    const logText = el("logText");
-    const questText = el("questText");
-    const choiceList = el("choiceList");
-    const inventoryItems = el("inventoryItems");
-    const affinityValue = el("affinityValue");
-    const affinityBar = el("affinityBar");
-    const playerHpText = el("playerHpText");
-    const playerHpBar = el("playerHpBar");
-    const bossCard = el("bossCard");
-    const bossBadge = el("bossBadge");
-    const bossName = el("bossName");
-    const bossSource = el("bossSource");
-    const bossIntro = el("bossIntro");
-    const bossHpText = el("bossHpText");
-    const bossHpBar = el("bossHpBar");
-    const attackBtn = el("attackBtn");
-    const jointBtn = el("jointBtn");
-    const nextBtn = el("nextBtn");
-    const endingBtn = el("endingBtn");
-    const hintBtn = el("hintBtn");
-    const resetBtn = el("resetBtn");
-    const modal = el("modal");
-    const modalTitle = el("modalTitle");
-    const modalBody = el("modalBody");
-    const modalCloseBtn = el("modalCloseBtn");
-    const galleryPanel = el("galleryPanel");
-    const galleryStrip = el("galleryStrip");
-    const healToast = el("healToast");
-    const kiritoMini = el("kiritoMini");
-    const asunaMini = el("asunaMini");
-    const asunaMiniWrap = el("asunaMiniWrap");
-    const modeChip = el("modeChip");
+    const bootScreen = el("bootScreen"), gameScreen = el("gameScreen"), bootLinesEl = el("bootLines"), bootProgress = el("bootProgress"), bootStatus = el("bootStatus"), linkState = el("linkState"), linkBar = el("linkBar"), beginBtn = el("beginBtn"), skipBtn = el("skipBtn"), bootTokenCount = el("bootTokenCount"), chapterTitle = el("chapterTitle"), chapterSub = el("chapterSub"), floorChip = el("floorChip"), stageBg = el("stageBg"), floorTag = el("floorTag"), stageNote = el("stageNote"), stageLayer = el("stageLayer"), dialogueText = el("dialogueText"), logText = el("logText"), questText = el("questText"), choiceList = el("choiceList"), inventoryItems = el("inventoryItems"), affinityValue = el("affinityValue"), affinityBar = el("affinityBar"), playerHpText = el("playerHpText"), playerHpBar = el("playerHpBar"), bossCard = el("bossCard"), bossBadge = el("bossBadge"), bossName = el("bossName"), bossSource = el("bossSource"), bossIntro = el("bossIntro"), bossHpText = el("bossHpText"), bossHpBar = el("bossHpBar"), attackBtn = el("attackBtn"), jointBtn = el("jointBtn"), nextBtn = el("nextBtn"), endingBtn = el("endingBtn"), hintBtn = el("hintBtn"), resetBtn = el("resetBtn"), modal = el("modal"), modalTitle = el("modalTitle"), modalBody = el("modalBody"), modalCloseBtn = el("modalCloseBtn"), galleryPanel = el("galleryPanel"), galleryStrip = el("galleryStrip"), healToast = el("healToast"), kiritoMini = el("kiritoMini"), asunaMini = el("asunaMini"), asunaMiniWrap = el("asunaMiniWrap"), modeChip = el("modeChip");
 
-    function showModal(title, html, actionLabel = "Close", action = null) {
+    function showModal(title, bodyHTML, actionLabel = "Close", action = null) {
       modalTitle.textContent = title;
-      modalBody.innerHTML = html;
+      modalBody.innerHTML = bodyHTML;
       modalCloseBtn.textContent = actionLabel;
-      state.modalAction = action;
+      state._modalAction = action;
       modal.classList.remove("hidden");
     }
-
-    function closeModal() {
-      modal.classList.add("hidden");
-      state.modalAction = null;
-    }
-
-    modalCloseBtn.onclick = () => {
-      const action = state.modalAction;
-      closeModal();
-      if (typeof action === "function") action();
-    };
+    function closeModal() { modal.classList.add("hidden"); state._modalAction = null; }
+    modalCloseBtn.onclick = () => { const action = state._modalAction; closeModal(); if (typeof action === "function") action(); };
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
     function showHealToast(text) {
-      healToast.innerHTML = `
-        <img src="${asset(HEAL_IMAGE)}" alt="Healing Asuna" />
-        <p>${text}</p>
-      `;
+      healToast.innerHTML = `<img src="${asset(HEAL_IMAGE)}" alt="Healing Asuna" /><p>${text}</p>`;
       healToast.classList.add("show");
       healToast.classList.remove("hidden");
       clearTimeout(showHealToast._t);
-      showHealToast._t = setTimeout(() => {
-        healToast.classList.remove("show");
-        setTimeout(() => healToast.classList.add("hidden"), 220);
-      }, 1300);
+      showHealToast._t = setTimeout(() => { healToast.classList.remove("show"); setTimeout(() => healToast.classList.add("hidden"), 220); }, 1300);
     }
 
-    function typeBoot() {
-      const lines = [
-        "INITIALIZING AINCRAD SYSTEM...",
-        "NERVEGEAR LINK ESTABLISHED",
-        "PLAYER PROFILE LOCKED: RICK VARGAS",
-        "QUEST GUIDE VERIFIED: ASUNA",
-        "SYNCING YUI FRAGMENTS...",
-        "FLOOR MAP ONLINE",
-        "READY FOR QUEST ACCEPTANCE"
-      ];
-      let lineIndex = 0;
-      let charIndex = 0;
+    function bootType() {
+      const lines = ["INITIALIZING AINCRAD SYSTEM...","NERVEGEAR LINK ESTABLISHED","PLAYER PROFILE LOCKED: RICK VARGAS","QUEST GUIDE VERIFIED: ASUNA","SYNCING YUI FRAGMENTS...","FLOOR MAP ONLINE","READY FOR QUEST ACCEPTANCE"];
+      let lineIndex = 0, charIndex = 0;
       const timer = setInterval(() => {
         const line = lines[lineIndex] || "";
-        bootLinesEl.textContent = lines.slice(0, lineIndex).join("
-") + (lineIndex > 0 ? "
-" : "") + line.slice(0, charIndex);
+        bootLinesEl.textContent = lines.slice(0, lineIndex).join("\n") + (lineIndex > 0 ? "\n" : "") + line.slice(0, charIndex);
         const progress = Math.min(100, ((lineIndex + charIndex / Math.max(1, line.length)) / lines.length) * 100);
         bootProgress.style.width = `${progress}%`;
         linkBar.style.width = `${progress}%`;
         linkState.textContent = lineIndex < lines.length - 1 ? "Connecting" : "Ready";
         bootStatus.textContent = lineIndex < lines.length - 1 ? "Booting..." : "Ready to Begin";
-
         charIndex++;
-        if (charIndex > line.length) {
-          lineIndex++;
-          charIndex = 0;
-        }
+        if (charIndex > line.length) { lineIndex++; charIndex = 0; }
         if (lineIndex >= lines.length) {
           clearInterval(timer);
-          bootLinesEl.textContent = lines.join("
-");
+          bootLinesEl.textContent = lines.join("\n");
           bootProgress.style.width = "100%";
           linkBar.style.width = "100%";
           linkState.textContent = "Ready";
@@ -971,140 +330,47 @@
       }, 28);
     }
 
-    function currentMode() {
-      if (state.chapterIndex >= 4) return "alization";
-      if (state.buffActive) return "alo";
-      return "sao";
-    }
-
+    function currentMode() { if (state.chapterIndex >= 4) return "alization"; if (state.buffActive) return "alo"; return "sao"; }
     function applyMode() {
-      state.currentMode = currentMode();
-      const set = avatarSets[state.currentMode];
+      const set = avatarSets[currentMode()];
       kiritoMini.src = asset(set.kirito);
       asunaMini.src = asset(set.asuna);
       modeChip.textContent = set.label;
-      asunaMiniWrap.classList.toggle("hidden", !state.asunaVisible && state.chapterIndex < 4);
+      asunaMiniWrap.classList.toggle("hidden", !(state.asunaVisible || state.chapterIndex >= 4));
     }
 
     function updateInventory() {
-      inventoryItems.innerHTML = `
-        <div class="item">Yui Fragments x${state.totalTokens}</div>
-        <div class="item">Floor Fragments x${state.floorTokens}/${chapters[state.chapterIndex].tokens.length}</div>
-        <div class="item">Heals x${state.healCount}</div>
-      `;
+      inventoryItems.innerHTML = `<div class="item">Yui Fragments x${state.totalTokens}</div><div class="item">Floor Fragments x${state.floorTokens}/${chapters[state.chapterIndex].tokens.length}</div><div class="item">Heals x${state.healCount}</div>`;
       bootTokenCount.textContent = state.totalTokens;
       affinityValue.textContent = state.affinity;
       affinityBar.style.width = `${state.affinity}%`;
       playerHpText.textContent = state.playerHp;
       playerHpBar.style.width = `${state.playerHp}%`;
-      if (state.bossMaxHp > 0) {
-        bossHpText.textContent = state.bossHp;
-        bossHpBar.style.width = `${Math.max(0, (state.bossHp / state.bossMaxHp) * 100)}%`;
-      }
+      if (state.bossMaxHp > 0) { bossHpText.textContent = state.bossHp; bossHpBar.style.width = `${Math.max(0, (state.bossHp / state.bossMaxHp) * 100)}%`; }
     }
 
-    function populateGallery() {
-      galleryStrip.innerHTML = galleryItems
-        .concat(galleryItems)
-        .map(([src, caption]) => `
-          <div class="gallery-card">
-            <img src="${asset(src)}" alt="${caption}" />
-            <p>${caption}</p>
-          </div>
-        `)
-        .join("");
-    }
-
+    function populateGallery() { galleryStrip.innerHTML = galleryItems.concat(galleryItems).map(([src, caption]) => `<div class="gallery-card"><img src="${asset(src)}" alt="${caption}"><p>${caption}</p></div>`).join(""); }
+    function clearHealLoop() { if (state.healTimer) { clearInterval(state.healTimer); state.healTimer = null; } }
     function showBossIntro(chapter) {
-      const isFinal = chapter.floor === 100;
-      const body = isFinal
-        ? `
-          <div class="battle-preview">
-            <img src="${asset(avatarSets.alization.kirito)}" alt="Kirito alicization" />
-            <img src="${asset(avatarSets.alization.asuna)}" alt="Asuna alicization" />
-          </div>
-          <div class="modal-visual" style="margin-top:12px;">
-            <img src="${asset(chapter.boss.art)}" alt="${chapter.boss.name}" />
-          </div>
-          <p>${chapter.boss.intro}</p>
-        `
-        : chapter.floor >= 90
-          ? `
-            <div class="modal-visual">
-              <img src="${asset(chapter.boss.art)}" alt="${chapter.boss.name}" />
-            </div>
-            <p>${chapter.boss.intro}</p>
-          `
-          : `
-            <div class="battle-preview">
-              <img src="${asset(avatarSets.sao.kirito)}" alt="Kirito dual wield" />
-              <img src="${asset(avatarSets.sao.asuna)}" alt="Asuna SAO" />
-            </div>
-            <div class="modal-visual" style="margin-top:12px;">
-              <img src="${asset(chapter.boss.art)}" alt="${chapter.boss.name}" />
-            </div>
-            <p>${chapter.boss.intro}</p>
-          `;
+      const body = chapter.floor >= 90 ? `<div class="modal-visual"><img src="${asset(chapter.boss.art)}" alt="${chapter.boss.name}"></div><p>${chapter.boss.intro}</p>` : `<div class="battle-preview"><img src="${asset(avatarSets.sao.kirito)}" alt="Kirito dual wield"><img src="${asset(avatarSets.sao.asuna)}" alt="Asuna SAO"></div><div class="modal-visual" style="margin-top:12px;"><img src="${asset(chapter.boss.art)}" alt="${chapter.boss.name}"></div><p>${chapter.boss.intro}</p>`;
       showModal(chapter.boss.name, body, "Close");
     }
 
-    function renderFloor() {
-      const chapter = chapters[state.chapterIndex];
-      state.floorTokens = 0;
-      state.bossCleared = !chapter.boss;
-      state.bossHp = chapter.boss ? chapter.boss.hp : 0;
-      state.bossMaxHp = chapter.boss ? chapter.boss.hp : 0;
-      state.aloAttackShown = false;
-      stageBg.src = asset("background.jpeg");
-      chapterTitle.textContent = chapter.title;
-      chapterSub.textContent = chapter.sub;
-      floorChip.textContent = `Floor ${chapter.floor}/100`;
-      floorTag.textContent = chapter.boss ? "Boss Floor" : "Quest Stage";
-      stageNote.textContent = chapter.note;
-      questText.textContent = chapter.quest;
-      logText.textContent = chapter.quest;
-      dialogueText.textContent = "A system message will appear here.";
-      choiceList.innerHTML = "";
-      stageLayer.innerHTML = "";
-      bossCard.style.display = chapter.boss ? "block" : "none";
-      galleryPanel.style.display = "none";
-      attackBtn.disabled = true;
-      jointBtn.disabled = true;
-      clearHealLoop();
-
-      applyMode();
-      updateInventory();
-      renderActions();
-      renderTokens(chapter);
-      checkProgress();
-
-      if (chapter.boss && state.lastIntroShown !== state.chapterIndex) {
-        state.lastIntroShown = state.chapterIndex;
-        setTimeout(() => showBossIntro(chapter), 320);
-      }
-
-      if (chapter.floor === 100 && state.galleryUnlocked) {
-        galleryPanel.style.display = "block";
-        populateGallery();
-      }
-    }
-
     function renderTokens(chapter) {
-      chapter.tokens.forEach((token, idx) => {
+      chapter.tokens.forEach((token) => {
         const btn = document.createElement("button");
         btn.className = "yui-token";
         btn.style.left = `${token.x}%`;
         btn.style.top = `${token.y}%`;
         btn.textContent = "Y";
-        btn.title = `Yui Fragment ${idx + 1}`;
         btn.onclick = () => {
           state.floorTokens += 1;
           state.totalTokens += 1;
           state.affinity = Math.min(100, state.affinity + 4);
           dialogueText.textContent = `Yui fragment collected on Floor ${chapter.floor}.`;
           logText.textContent = dialogueText.textContent;
-          updateInventory();
           btn.remove();
+          updateInventory();
           checkProgress();
         };
         stageLayer.appendChild(btn);
@@ -1114,7 +380,6 @@
     function renderActions() {
       const chapter = chapters[state.chapterIndex];
       choiceList.innerHTML = "";
-
       if (!chapter.boss) {
         const chip = document.createElement("div");
         chip.className = "chip";
@@ -1122,15 +387,13 @@
         choiceList.appendChild(chip);
         return;
       }
-
       const attack = document.createElement("button");
-      attack.innerHTML = `<strong>ATTACK</strong><small>Deal normal damage to ${chapter.boss.name}.</small>`;
+      attack.innerHTML = "<strong>ATTACK</strong><small>Deal normal damage to the boss.</small>";
       attack.onclick = () => attackBoss("attack");
       choiceList.appendChild(attack);
-
       if (state.chapterIndex <= 2) {
         const joint = document.createElement("button");
-        joint.innerHTML = `<strong>JOINT ATTACK</strong><small>Rick and Asuna strike together. Available on the SAO floors only.</small>`;
+        joint.innerHTML = "<strong>JOINT ATTACK</strong><small>Rick and Asuna strike together. Available on the SAO floors only.</small>";
         joint.onclick = () => attackBoss("joint");
         choiceList.appendChild(joint);
       } else if (state.chapterIndex === 3) {
@@ -1150,16 +413,10 @@
       const chapter = chapters[state.chapterIndex];
       const tokensComplete = state.floorTokens >= chapter.tokens.length;
       const bossComplete = !chapter.boss || state.bossCleared;
-
       nextBtn.disabled = !(tokensComplete && bossComplete && state.chapterIndex < chapters.length - 1);
       endingBtn.disabled = !(state.chapterIndex === chapters.length - 1 && tokensComplete && bossComplete && state.galleryUnlocked);
-      if (chapter.boss) {
-        attackBtn.disabled = !(tokensComplete && !state.bossCleared);
-        jointBtn.disabled = !(tokensComplete && !state.bossCleared && state.chapterIndex <= 2);
-      } else {
-        attackBtn.disabled = true;
-        jointBtn.disabled = true;
-      }
+      if (chapter.boss) { attackBtn.disabled = !(tokensComplete && !state.bossCleared); jointBtn.disabled = !(tokensComplete && !state.bossCleared && state.chapterIndex <= 2); }
+      else { attackBtn.disabled = true; jointBtn.disabled = true; }
       applyMode();
       updateInventory();
     }
@@ -1173,18 +430,11 @@
           state.affinity = Math.min(100, state.affinity + 1);
           state.healCount += 1;
           state.asunaVisible = true;
-          applyMode();
           updateInventory();
+          applyMode();
           showHealToast("Asuna ALO healer is restoring your HP.");
         }
       }, 1450);
-    }
-
-    function clearHealLoop() {
-      if (state.healTimer) {
-        clearInterval(state.healTimer);
-        state.healTimer = null;
-      }
     }
 
     function bossDefeatSequence() {
@@ -1198,134 +448,55 @@
       showHealToast(chapter.boss.heal);
       renderActions();
       checkProgress();
-
       if (state.chapterIndex < chapters.length - 1) {
-        showModal(
-          `Boss Cleared — ${chapter.boss.name}`,
-          `
-            <div class="modal-visual">
-              <img src="${asset(HEAL_IMAGE)}" alt="Healing Asuna" />
-            </div>
-            <p>${chapter.boss.heal}</p>
-          `,
-          "Continue",
-          () => {
-            advanceFloor();
-          }
-        );
+        showModal(`Boss Cleared — ${chapter.boss.name}`, `<div class="modal-visual"><img src="${asset(HEAL_IMAGE)}" alt="Healing Asuna"></div><p>${chapter.boss.heal}</p>`, "Continue", () => advanceFloor());
       } else {
         state.galleryUnlocked = true;
         galleryPanel.style.display = "block";
         populateGallery();
         checkProgress();
-        showModal(
-          `Boss Cleared — ${chapter.boss.name}`,
-          `
-            <div class="battle-preview">
-              <img src="${asset(avatarSets.alization.kirito)}" alt="Kirito alicization" />
-              <img src="${asset(avatarSets.alization.asuna)}" alt="Asuna alicization" />
-            </div>
-            <div class="modal-visual" style="margin-top:12px;">
-              <img src="${asset(HEAL_IMAGE)}" alt="Healing Asuna" />
-            </div>
-            <p>${chapter.boss.heal}</p>
-            <p style="margin-top:10px;">The final reward is unlocked.</p>
-          `,
-          "Open final reward",
-          () => {
-            endingBtn.disabled = false;
-            openEnding();
-          }
-        );
+        showModal(`Boss Cleared — ${chapter.boss.name}`, `<div class="battle-preview"><img src="${asset(avatarSets.alization.kirito)}" alt="Kirito alicization"><img src="${asset(avatarSets.alization.asuna)}" alt="Asuna alicization"></div><div class="modal-visual" style="margin-top:12px;"><img src="${asset(HEAL_IMAGE)}" alt="Healing Asuna"></div><p>${chapter.boss.heal}</p><p style="margin-top:10px;">The final reward is unlocked.</p>`, "Open final reward", () => { endingBtn.disabled = false; openEnding(); });
       }
     }
 
     function attackBoss(type) {
       const chapter = chapters[state.chapterIndex];
       if (!chapter.boss || state.bossCleared) return;
-      if (state.floorTokens < chapter.tokens.length) {
-        showModal("Collect more", `<p>Find every Yui fragment on this floor before you fight.</p>`);
-        return;
-      }
-
+      if (state.floorTokens < chapter.tokens.length) { showModal("Collect more", "<p>Find every Yui fragment on this floor before you fight.</p>"); return; }
       if (state.chapterIndex === 3 && !state.aloAttackShown) {
         state.aloAttackShown = true;
-        showModal(
-          "Kirito ALO Attack",
-          `
-            <div class="modal-visual">
-              <img src="${asset(ALO_ATTACK_IMAGE)}" alt="Kirito ALO attack" />
-            </div>
-            <p>The first ALO strike lands as Oberon comes into view.</p>
-          `,
-          "Continue",
-          null
-        );
+        showModal("Kirito ALO Attack", `<div class="modal-visual"><img src="${asset(ALO_ATTACK_IMAGE)}" alt="Kirito ALO attack"></div><p>The first ALO strike lands as Oberon comes into view.</p>`);
       }
-
       if (type === "joint" && state.chapterIndex <= 2) {
         state.jointCount += 1;
-        showModal(
-          "Joint Attack",
-          `
-            <div class="modal-visual">
-              <img src="${asset(JOIN_IMAGE)}" alt="Joint attack" />
-            </div>
-            <p>Rick and Asuna strike together.</p>
-          `,
-          "Continue"
-        );
+        showModal("Joint Attack", `<div class="modal-visual"><img src="${asset(JOIN_IMAGE)}" alt="Joint attack"></div><p>Rick and Asuna strike together.</p>`);
         if (state.jointCount >= 3 && !state.buffActive) {
           state.buffActive = true;
           state.asunaVisible = true;
           applyMode();
-          showModal(
-            "Attack Buff Unlocked",
-            `
-              <div class="modal-visual">
-                <img src="${asset(BUFF_IMAGE)}" alt="Asuna buffer" />
-              </div>
-              <p>Three joint attacks completed. Your attack power is now buffed, and the ALO phase begins.</p>
-            `,
-            "Continue"
-          );
+          showModal("Attack Buff Unlocked", `<div class="modal-visual"><img src="${asset(BUFF_IMAGE)}" alt="Asuna buffer"></div><p>Three joint attacks completed. Your attack power is now buffed, and the ALO phase begins.</p>`);
         }
       }
-
       const base = type === "joint" ? 20 : 14;
       const buff = state.buffActive ? 1.35 : 1;
       const damage = Math.round(base * buff);
       const counter = chapter.floor === 90 ? 24 : chapter.floor === 100 ? 26 : chapter.floor === 75 ? 17 : 12;
-
       state.bossHp = Math.max(0, state.bossHp - damage);
       state.playerHp = Math.max(1, state.playerHp - counter);
       state.affinity = Math.min(100, state.affinity + (type === "joint" ? 3 : 2));
-      updateInventory();
-      checkProgress();
       dialogueText.textContent = `${chapter.boss.name} takes ${damage} damage. The boss counters back.`;
       logText.textContent = dialogueText.textContent;
-
-      if (state.chapterIndex === 3 && state.playerHp <= 35) {
-        startHealLoop();
-      }
-
-      if (state.bossHp <= 0) {
-        bossDefeatSequence();
-      } else {
-        if (state.chapterIndex === 3 && state.playerHp <= 40) startHealLoop();
-      }
+      updateInventory();
+      checkProgress();
+      if (state.chapterIndex === 3 && state.playerHp <= 35) startHealLoop();
+      if (state.bossHp <= 0) bossDefeatSequence();
+      else if (state.chapterIndex === 3 && state.playerHp <= 40) startHealLoop();
     }
 
     function advanceFloor() {
       const chapter = chapters[state.chapterIndex];
-      if (chapter.boss && !state.bossCleared) {
-        showModal("Boss locked", `<p>Defeat the boss first.</p>`);
-        return;
-      }
-      if (state.floorTokens < chapter.tokens.length) {
-        showModal("Collect more", `<p>Find all Yui fragments on this floor first.</p>`);
-        return;
-      }
+      if (chapter.boss && !state.bossCleared) { showModal("Boss locked", "<p>Defeat the boss first.</p>"); return; }
+      if (state.floorTokens < chapter.tokens.length) { showModal("Collect more", "<p>Find all Yui fragments on this floor first.</p>"); return; }
       if (state.chapterIndex < chapters.length - 1) {
         state.chapterIndex += 1;
         state.floorTokens = 0;
@@ -1337,41 +508,11 @@
 
     function openEnding() {
       if (state.chapterIndex !== chapters.length - 1 || !state.galleryUnlocked || state.floorTokens < chapters[state.chapterIndex].tokens.length) return;
-      showModal(
-        "Happy Birthday, Ricky.",
-        `
-          <p>Dear Ricky,</p>
-          <p style="margin-top:12px;">You cleared every floor, collected every Yui fragment, and survived every boss fight. But the real reward was never the final screen. It was every moment we made together along the way.</p>
-          <p style="margin-top:12px;">From shivering through SlashCo, to watching anime, to cooking for each other, hanging out, comforting each other, and playing games side by side, you've given me so many memories I never want to lose.</p>
-          <p style="margin-top:12px;">You are my favorite teammate, my favorite person to talk to, and one of the best parts of my life. I hope this birthday reminds you how loved you are and how grateful I am that I get to be with you.</p>
-          <p style="margin-top:12px;">Happy Birthday, Ricky. ❤️</p>
-          <p style="margin-top:12px;">Love,<br>Your Asuna</p>
-        `,
-        "Close"
-      );
+      showModal("Happy Birthday, Ricky.", `<p>Dear Ricky,</p><p style="margin-top:12px;">You cleared every floor, collected every Yui fragment, and survived every boss fight. But the real reward was never the final screen. It was every moment we made together along the way.</p><p style="margin-top:12px;">From shivering through SlashCo, to watching anime, to cooking for each other, hanging out, comforting each other, and playing games side by side, you've given me so many memories I never want to lose.</p><p style="margin-top:12px;">You are my favorite teammate, my favorite person to talk to, and one of the best parts of my life. I hope this birthday reminds you how loved you are and how grateful I am that I get to be with you.</p><p style="margin-top:12px;">Happy Birthday, Ricky. ❤️</p><p style="margin-top:12px;">Love,<br>Your Asuna</p>`);
     }
 
     function resetGame() {
-      state.chapterIndex = 0;
-      state.affinity = 0;
-      state.playerHp = 100;
-      state.bossHp = 0;
-      state.bossMaxHp = 0;
-      state.floorTokens = 0;
-      state.totalTokens = 0;
-      state.bossCleared = false;
-      state.buffActive = false;
-      state.jointCount = 0;
-      state.asunaVisible = false;
-      state.healCount = 0;
-      state.galleryUnlocked = false;
-      state.lastIntroShown = -1;
-      state.aloAttackShown = false;
-      state.modalAction = null;
-      state.currentMode = "sao";
-      clearHealLoop();
-      closeModal();
-      renderFloor();
+      state.chapterIndex = 0; state.affinity = 0; state.playerHp = 100; state.bossHp = 0; state.bossMaxHp = 0; state.floorTokens = 0; state.totalTokens = 0; state.bossCleared = false; state.buffActive = false; state.jointCount = 0; state.asunaVisible = false; state.healCount = 0; state.galleryUnlocked = false; state.lastIntroShown = -1; state.aloAttackShown = false; clearHealLoop(); closeModal(); renderFloor();
     }
 
     beginBtn.addEventListener("click", () => { bootScreen.classList.add("hidden"); gameScreen.classList.remove("hidden"); renderFloor(); });
@@ -1380,15 +521,8 @@
     attackBtn.addEventListener("click", () => attackBoss("attack"));
     jointBtn.addEventListener("click", () => attackBoss("joint"));
     endingBtn.addEventListener("click", openEnding);
-    hintBtn.addEventListener("click", () => {
-      const chapter = chapters[state.chapterIndex];
-      const msg = chapter.boss
-        ? `Collect ${chapter.tokens.length - state.floorTokens} more Yui fragment(s), then attack the boss.`
-        : `Collect the Yui fragments hidden around the floor.`;
-      showModal("Hint", `<p>${msg}</p>`);
-    });
+    hintBtn.addEventListener("click", () => { const chapter = chapters[state.chapterIndex]; const msg = chapter.boss ? `Collect ${chapter.tokens.length - state.floorTokens} more Yui fragment(s), then attack the boss.` : "Collect the Yui fragments hidden around the floor."; showModal("Hint", `<p>${msg}</p>`); });
     resetBtn.addEventListener("click", resetGame);
-
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
     window.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
@@ -1416,19 +550,11 @@
       renderActions();
       renderTokens(chapter);
       checkProgress();
-
-      if (chapter.boss && state.lastIntroShown !== state.chapterIndex) {
-        state.lastIntroShown = state.chapterIndex;
-        setTimeout(() => showBossIntro(chapter), 320);
-      }
-
-      if (chapter.floor === 100 && state.galleryUnlocked) {
-        galleryPanel.style.display = "block";
-        populateGallery();
-      }
+      if (chapter.boss && state.lastIntroShown !== state.chapterIndex) { state.lastIntroShown = state.chapterIndex; setTimeout(() => showBossIntro(chapter), 320); }
+      if (chapter.floor === 100 && state.galleryUnlocked) { galleryPanel.style.display = "block"; populateGallery(); }
     }
 
-    typeBoot();
+    bootType();
     updateInventory();
     renderFloor();
   </script>
